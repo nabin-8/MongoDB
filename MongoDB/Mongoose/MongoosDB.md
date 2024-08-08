@@ -93,4 +93,143 @@ User.insertMany([
 ```
 
 #### Note
-- Mongoose
+- Mongoose uses Operation Buffering
+- Mongoose lets you start using your models immediately, without waiting for mongoose to establish a connection to MongoDB. 
+
+### Find in Mongoose
+```javascript
+Model.find() //returns a Query Object (thennable)
+```
+- Mongoose Queries are not promises. But they have a .then()
+
+```javascript
+User.find().then((data)=>{
+  console.log(data);
+});
+
+User.find({age:{$gte:47}}).then((data)=>{
+    console.log(data);
+})
+```
+- FindOne
+```javascript
+Model.findOne() //returns a single result
+
+User.findOne({age:{$gte:48}}).then((data)=>{
+      console.log(data);
+})
+```
+- FindByID()
+```javascript
+User.findById("66b376a834c86e2239bd5f96").then((res) => {
+    console.log(res);
+
+}).catch((err) => {
+    console.log(err);
+
+})
+```
+
+### UPDATE
+- model.updateOne()
+```javascript
+User.updateOne({name: "Bruce"}, {age:49}).then((res)=>{
+      console.log(res);
+})
+
+```
+- model.updateMany()
+```javascript
+User.updateMany({age:{$gt:45}}, {age:45}).then((res)=>{
+      console.log(res);
+})
+
+```
+- Model.findOneAndUpdate()
+```javascript
+User.findOneAndUpdate({name:"sairaj"}, {age:60}, {new:true}).then((res)=>{
+      console.log(res);
+})
+
+```
+- Model.findByIdAndUpdate()
+
+### DELETE
+- Model.deleteOne() //returns count
+```javascript
+User.deleteOne({name:"adyatan"}).then((res)=>{
+    console.log(res);
+})
+```
+### DELETE
+- Model.deleteMany() //returns count
+```javascript
+User.deleteMany({age:{$gt:40}}).then((res)=>{
+    console.log(res);
+})
+```
+- Model.findByIdAndDelete()
+- Model.findOneAndDelete()
+
+### Schema Validations
+- Basically, Rules for schema
+```javascript
+const bookSchema=mongoose.Schema({
+  title:{
+    type:String,
+    required:true,
+  },
+  author:{
+    type:String
+  },
+  price:{
+    type:Number
+  }
+})
+```
+### Schema type options
+```javascript
+const booksSchema = new mongoose.Schema({
+    title: {
+        type: String,
+        required: true,
+        maxLength: 20
+    },
+    author: {
+        type: String
+    },
+    price: {
+        type: Number,
+        min: 1
+    },
+    discount: {
+        type: Number,
+        default: 0
+    },
+    category: {
+        type: String,
+        enum: ["fiction", "non-fiction"]
+    }
+})
+
+const Book = mongoose.model("Book", booksSchema)
+
+let book1 = new Book({
+    title: "Marvel Comics",
+    // author: "RD Sharma",
+    price: 399,
+    category: "fiction"
+})
+
+book1.save()
+    .then(res => console.log(res))
+    .catch(err => console.log(err))
+```
+
+### Validation in updation & Errors
+```javascript
+
+Book.findByIdAndUpdate("66b4dbfba3969b0f001bd3b7", { price: -500 }, { runValidators: true })
+    .then(res => console.log(res))
+    .catch(err => console.log(err.errors.price.properties.message))
+```
